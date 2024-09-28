@@ -1,0 +1,49 @@
+### Extracting User Journey Data Using SQL
+
+In this project, my objective is to write a query that extracts data for subsequent user journey analysis. The focus is on understanding the sequence of pages visited by users leading up to a purchase. My task is to group all the pages visited in a session into one string, but only for paying customers who have purchased a subscription plan.
+
+### Key Project Requirements:
+
+1. **Focus on Paying Customers:** 
+   I will only extract the user journey of customers who made their first purchase between January 1, 2023, and March 31, 2023 (inclusive).
+   
+2. **Page Interactions Before Purchase:** 
+   I will consider all page interactions that occurred before the user's first purchase date.
+
+3. **Filtering Test Users:** 
+   I will filter out test users by ensuring that only users who paid a positive amount for their subscription are included. Any users with a purchase price of $0 will be excluded.
+
+4. **URL Aliases for Clarity:** 
+   Instead of using long, cluttered URLs, I will replace them with short and meaningful aliases for better readability. For example, the homepage URL will be aliased as "Homepage."
+
+5. **Concatenating User Journeys:** 
+   For each session, I will concatenate all the pages visited into a single user journey string. The pages will be separated by a hyphen (-), not a comma, to avoid conflicts with the CSV format.
+
+6. **Excluding Pages After Purchase:** 
+   Since the focus is on the user's journey leading up to the purchase, I will exclude any pages visited after the purchase (e.g., 'thank you' or 'purchase confirmation' pages).
+
+### Approach:
+
+To achieve the objectives, I will break the query down into multiple smaller steps using a Common Table Expression (CTE) with the `WITH` clause. This allows me to create modular subqueries that are easier to manage and test independently.
+
+1. **Step 1: Identify Paid Users**  
+   I will start by writing a query to list all users who purchased a subscription between January 1 and March 31, 2023. I will filter out test users by excluding those who paid $0. The query will include four columns: `user_id`, `first_purchase_date`, `subscription_type`, and `purchase_price`.
+
+2. **Step 2: Extract Relevant Interactions**  
+   Next, I will use the `paid_users` table to cross-reference their visitor IDs and extract all their relevant interactions from the `front_interactions` table. This will include interactions that occurred before their first purchase, and I will focus on the source and destination URLs.
+
+3. **Step 3: Replace URLs with Aliases**  
+   To improve readability, I will assign short aliases to the URLs. For example, URLs that start with `https://365datascience.com/resources-center/` will be aliased as "Resources Center." I’ll use a `CASE` statement to achieve this.
+
+4. **Step 4: Concatenate Pages**  
+   I will then use `CONCAT()` to combine the source and destination URLs into a single string for each page interaction. I'll separate these strings with a hyphen (-).
+
+5. **Step 5: Group and Concatenate User Journeys**  
+   In the final step, I will use `GROUP_CONCAT()` to aggregate all the page interactions for each session into one long string, representing the user’s journey through the platform. I will ensure that the maximum string length is sufficient to avoid truncation, setting `group_concat_max_len` to 100,000 symbols.
+
+6. **Exporting to CSV:**  
+   The final result will be ordered by `user_id` and `session_id`, and then exported as a CSV file with the following columns: `user_id`, `session_id`, `subscription_type`, and `user_journey`.
+
+### Conclusion:
+
+This project demonstrates how to effectively use SQL to extract and preprocess user journey data. By utilizing CTEs, filtering relevant data, and leveraging functions like `CONCAT()` and `GROUP_CONCAT()`, I can streamline the extraction process and create clean, readable data ready for analysis. The final output will be a comprehensive CSV file that captures user journeys, which can then be used for further analysis in subsequent projects.
